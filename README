@@ -1,0 +1,8 @@
+This is an attempt to port YUI Builder to node.js
+
+This tool relies heavily on external node.js modules to get the heavy lifting done.
+
+The structure of the tool will initially comply exactly to the output of YUI Builder, you won't need to
+change any build files if you have been using YUI builder previously.
+
+Over time the build tasks may be written asynchronously to help with large builds.
