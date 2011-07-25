@@ -36,10 +36,9 @@ component = {
         lint : prop['lint.skip'] == 'true' ? true : false
     },
     jsfiles : prop['component.jsfiles'] ? 
-    prop['component.jsfiles'].split(',').map(function(v) {
-        return jsbasedir + '/' + v;
-    }) : 
-    fs.readdirSync(jsbasedir),
+        prop['component.jsfiles'].split(',').map(function(v) {
+            return jsbasedir + '/' + v;
+        }) : fs.readdirSync(jsbasedir),
     jsfilesbasedir : jsbasedir, // ./js
     filenames : {
         core : prop['component'] + '.js',
@@ -47,10 +46,12 @@ component = {
         min : prop['component'] + '-min.js'
     },
     // Strings which will hold the code, allocated as an in-memory string.
+    // Buffer might seem more appropriate but is actually a lot less performant.
     files : {
-        core : "",
-        debug : "",
-        min : ""
+        concat : "", // concat
+        registered : "", // register
+        raw : "", // take away logger
+        min : "" // reduce size
     },
     // Task definitions for file() type tasks, which ensure that we are only building changes.
     filetasks : {
@@ -61,17 +62,6 @@ component = {
     requires : prop['component.requires'] ? prop['component.requires'].split(',') : [],
     version : '1.0.0' // TODO: read from properties
 };
-    
-component.filetasks.debug[component.filenames.debug] = component.jsfiles.slice();
-component.filetasks.debug[component.filenames.debug].unshift(component.builddir); // Debug concat depends on builddir
-    
-component.filetasks.min[component.filenames.min] = component.jsfiles.slice();
-component.filetasks.min[component.filenames.min].unshift(component.builddir); // Debug concat depends on builddir
-    
-component.filetasks.raw[component.filenames.raw] = component.jsfiles.slice();
-component.filetasks.raw[component.filenames.raw].unshift(component.builddir); // Debug concat depends on builddir
-
-// TODO: instead of building these 3 separately, build concat, then register, then fork at nologger then fork at minify
 
 /**
  * The default task will build and deploy the module located in the current working directory.
@@ -79,11 +69,18 @@ component.filetasks.raw[component.filenames.raw].unshift(component.builddir); //
 desc('Default : build all');
 task({
     'default' : [
-    component.filenames.debug
-    , component.filenames.min
-//    , component.filenames.raw
-    ]
-    }, function() {
+        'build:clean'
+      , 'build:concat'
+      , 'build:lint'
+      , 'build:register'
+      , 'build:removelogging'
+      , 'build:minify'
+    ]}, function() {
+    
+    fs.writeFileSync(component.builddir + '/' + component.filenames.core, component.files.raw, 'utf8');
+    fs.writeFileSync(component.builddir + '/' + component.filenames.debug, component.files.registered, 'utf8');
+    fs.writeFileSync(component.builddir + '/' + component.filenames.min, component.files.min, 'utf8');
+    
     console.log('Module has been built');
 });
 
@@ -139,6 +136,48 @@ file(component.filetasks.min, function() {
 
 }, true);
 
+
+/**
+ * Each build task corresponds to a utils:task.
+ * 
+ * Here we just wrap those tasks to prevent them knowing about the specific
+ * paths or configuration names of the build file.
+ */
+namespace('build', function() {
+    desc('Build:clean (SYNC)');
+    task('clean', function() {
+        jake.Task['utils:clean'].execute();
+    });
+    
+    
+    desc('Build:concat (SYNC)');
+    task('concat', function() {
+        var t_concat = jake.Task['utils:concat'];
+        t_concat.execute.apply(t_concat, [component.files.concat, component.jsfiles]);
+    });
+    
+    desc('Build:lint (SYNC)');
+    task('lint', function() {
+        var t_lint = jake.Task['utils:lint'];
+        t_lint.execute.apply(t_lint, [component.jsfiles]);
+    });
+    
+    desc('Build:register (SYNC)');
+    task('register', function() {
+        jake.Task['utils:register'].execute();
+    });
+    
+    desc('Build:removelogging (SYNC)');
+    task('removelogging', function() {
+        jake.Task['utils:removelogging'].execute();
+    });
+    
+    desc('Build:minify (SYNC)');
+    task('minify', function() {
+        jake.Task['utils:minify'].execute();
+    });
+});
+
 /**
  * Generic build tasks common to modules and rollups
  */
@@ -147,7 +186,7 @@ namespace('utils', function() {
     /**
      * Concatenate a number of files to a destination file.
      * 
-     * The first argument is the destination file.
+     * The first argument is the destination variable (string).
      * The second argument is the array of source files, using fully qualified paths.
      */
     desc('Concatenate files (SYNC)');
@@ -158,15 +197,17 @@ namespace('utils', function() {
         
         console.log('Concatenating');
         console.log('\tSource files: ' + inputFiles.join(','));
-        console.log('\tTo: ' + outputFile);
+        console.log('\tTo: buffer');
 
         for (var i = 0; i < inputFiles.length; i++) {
             // TODO investigate using buffer/stream instead of string concatenation?
             output += fs.readFileSync(inputFiles[i]); 
         }
 
-        fs.writeFileSync(outputFile, output, 'utf8');
-        console.log('Wrote: ' + outputFile);  
+        component.files.concat = output;
+        
+        //fs.writeFileSync(outputFile, output, 'utf8');
+        console.log('Done concatenating');  
     });
 
     /**
@@ -178,14 +219,10 @@ namespace('utils', function() {
     desc('Wrap module in YUI.add statement');
     task('register', function() {
         var output,
-        outputFile = arguments[0],
-        inputFile = arguments[1],
         requiresQuoted = component.requires.map(function(v) {
             return "'" + v.trim() + "'";
         }),
-        data, template;
-           
-        data = fs.readFileSync(inputFile, 'utf8');
+        data = component.files.concat, template;
            
         // TODO: consider a tiny templating engine to take care of registration?
         // this would be closer to the YUI Builder implementation
@@ -202,10 +239,10 @@ namespace('utils', function() {
             "] });"
         ],
         output = template.join('');  
-                
-        fs.writeFileSync(outputFile, output, 'utf8');
 
-        console.log('Registered: ' + outputFile);
+        component.files.registered = output;
+
+        console.log('Registered module');
     });
     
     /**
@@ -215,61 +252,55 @@ namespace('utils', function() {
      */
     desc('Replace logger statements');
     task('removelogging', function() {
-        var outputFile = arguments[0],
-        inputFile = arguments[1],
-        data,
-        logger = {
-            regex : '^.*?(?:logger|Y.log).*?(?:;|\\).*;|(?:\r?\n.*?)*?\\).*;).*;?.*?\r?\n',
-            replace : "",
-            flags : "mg"
-        },
-        logger_regex = new RegExp(logger.regex, logger.flags);
-        
-        console.log('Replacing log statements in: ' + inputFile);
+        var data,
+            logger = {
+                regex : '^.*?(?:logger|Y.log).*?(?:;|\\).*;|(?:\r?\n.*?)*?\\).*;).*;?.*?\r?\n',
+                replace : "",
+                flags : "mg"
+            },
+            logger_regex = new RegExp(logger.regex, logger.flags);
 
-        data = fs.readFileSync(inputFile, 'utf8');
+        data = component.files.registered;
+        component.files.raw = data.replace(logger_regex, logger.replace);
 
-        var replaced = data.replace(logger_regex, logger.replace);
-           
-        fs.writeFileSync(outputFile, replaced, 'utf8');
-        console.log('Wrote: ' + outputFile);
+        console.log('Removed logger statements');
     });
     
-    desc('Run JSLint on source file (default settings)');
+    desc('Run JSLint on source file(s) (default settings)');
     task('lint', function() {
         
         // use try catch block to detect feature availability
         var linter = require('jslint/lib/linter.js'),
         reporter = require('jslint/lib/reporter.js'),
-        inputFile = arguments[0];
+        inputFiles = arguments[0],
+        i = 0,
+        lint_options = {};
 
-        console.log('Running JSLint on: ');
-        console.log('\t\t' + inputFile);
-
-        fs.readFile(inputFile, 'utf8', function (err, data) {
-            if (err) {
-                throw err;
-            }
-
-            data = data.toString("utf8");
-            var opts = {};
-            var result = linter.lint(data, opts); // No Options
-
-            reporter.report(inputFile, result);
+        for (; i < inputFiles.length; i++) {
+            console.log('Running JSLint on: ');
+            console.log('\t' + inputFiles[i]);
             
-            complete();
-        });
+            fs.readFile(inputFiles[i], 'utf8', function (err, data) {
+                if (err) {
+                    throw err;
+                }
+
+                data = data.toString("utf8");
+                var result = linter.lint(data, lint_options); // No Options
+
+                reporter.report(inputFiles[i], result);
+                complete();
+            });            
+        }
     }, true);
     
     desc('Minify the source using UglifyJS');
     task('minify', function() {
-        var outputFile = arguments[0],
-        inputFile = arguments[1],
-        jsp = require("uglify-js").parser,
-        pro = require("uglify-js").uglify,
-        data, ast;
+        var jsp = require("uglify-js").parser,
+            pro = require("uglify-js").uglify,
+            data, ast;
         
-        data = fs.readFileSync(inputFile, 'utf8');
+        data = component.files.raw;
 
         try {
             ast = jsp.parse(data); // parse into syntax tree
@@ -279,7 +310,9 @@ namespace('utils', function() {
             fail('The minify task failed, most likely the source file was unparseable. Please check your syntax. Error: ' + e.message);
         }
        
-        fs.writeFileSync(outputFile, pro.gen_code(ast), 'utf8');
+        component.files.min = pro.gen_code(ast);
+        
+        console.log('Created minified version');
     });
     
     desc('Clean the build directory');
