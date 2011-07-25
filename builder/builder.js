@@ -8,6 +8,13 @@
  * 
  * TODO: evaluate the possibility of using SOME asynchronous tasks.
  * TODO: prepend / append tasks
+ * TODO: consider jshint
+ * TODO: consider csslint
+ * 
+ * Relevant samey projects:
+ * https://github.com/dsimard/ready.js
+ * https://github.com/balupton/buildr.npm <- especially this one
+ * 
  */
 // boy i hate putting things in global scope but here it is for now
 
@@ -16,7 +23,7 @@ var fs = require('fs'),
 path = require('path'),
 iniparser = require('iniparser'), // Used for backwards compatibility with ANT build.properties
 prop = iniparser.parseSync('build.properties'),
-//mu = require('mu'),
+Mustache = require('Mustache'),
 
 // Directories
 basedir = '.',
@@ -30,10 +37,12 @@ jsbasedir = basedir + '/js',
 component = {
     component : prop['component'] || 'component', // TODO: fail if not specified
     builddir : prop['component.builddir'] || basedir + '/build_tmp',
+    rollup : prop['component.rollup'] == 'true' ? true : false,
     skip : {
         clean : prop['clean.skip'] == 'true' ? true : false,
         register : prop['register.skip'] == 'true' ? true : false,
-        lint : prop['lint.skip'] == 'true' ? true : false
+        lint : prop['lint.skip'] == 'true' ? true : false,
+        logger : prop['component.logger.regex.skip'] ? true : false // TODO: this
     },
     jsfiles : prop['component.jsfiles'] ? 
         prop['component.jsfiles'].split(',').map(function(v) {
@@ -53,6 +62,10 @@ component = {
         raw : "", // take away logger
         min : "" // reduce size
     },
+    assets : {
+        base : "./assets"
+    },
+    
     // Task definitions for file() type tasks, which ensure that we are only building changes.
     filetasks : {
         debug : {}, 
@@ -60,7 +73,31 @@ component = {
         raw : {}
     },
     requires : prop['component.requires'] ? prop['component.requires'].split(',') : [],
-    version : '1.0.0' // TODO: read from properties
+    version : '1.0.0', // TODO: read from properties
+    details : {
+        // Automatically load these components
+        use : prop['component.use'],
+        
+        // Modules that the component supersedes
+        supersedes : prop['component.supersedes'],
+        
+        // Modules required before this one
+        requires : prop['component.requires'],
+        
+        // Optional modules
+        optional : prop['component.optional'],
+        
+        // Modules that should be loaded before this one
+        after : prop['component.after'],
+        
+        // Array of i18n tags that this module has bundles for
+        lang : prop['component.lang'],
+        
+        // Auto load skin assets?
+        // NOTE: this is the only non-array details property, so don't convert to array literal
+        skinnable : prop['component.skinnable'] == 'true' ? true : false
+    },
+    details_arrays : ['use', 'supersedes', 'requires', 'optional', 'after', 'lang'] // Which details to process as comma separated arrays
 };
 
 /**
@@ -87,55 +124,7 @@ task({
 desc('Create temporary build directory to hold build files at each stage of the process.');
 directory(component.builddir);
 
-// Task : Build the -debug.js file (if the source files are newer)
-desc('Build file -debug.js');
-file(component.filetasks.debug, function() {
-    console.log('Building ' + component.filenames.debug);
-    
-    // Concat debug file if this file task qualifies to run (source files newer than build file)
-    var t_concat = jake.Task['utils:concat'],
-    t_add = jake.Task['utils:register'],
-    t_lint = jake.Task['utils:lint'];
-        
-    jake.Task['utils:concat'].execute.apply(t_concat, [component.builddir + '/' + component.filenames.core, component.jsfiles]);
-    
-    // JSLint will execute asynchronously, builder will continue to build output files.
-    if (!component.skip.lint) {
-        jake.Task['utils:lint'].execute.apply(t_lint, [component.builddir + '/' + component.filenames.core]);
-    }
-    
-    if (!component.skip.register) {
-        jake.Task['utils:register'].execute.apply(t_add, [component.builddir + '/' + component.filenames.debug, component.builddir + '/' + component.filenames.core]); 
-    }
-}, true);
-
-// Task : Build the -min.js file (if the source files are newer)
-desc('Build file -min.js');
-file(component.filetasks.min, function() {
-    
-    console.log('Creating minified file');
-    
-    // Concat debug file if this file task qualifies to run (source files newer than build file)
-    var t_concat = jake.Task['utils:concat'],
-    t_add = jake.Task['utils:register'],
-    t_logger = jake.Task['utils:removelogging'],
-    t_min = jake.Task['utils:minify'];
-        
-    // TODO: asynchronous executed tasks do not return synchronously (duh) so there needs to be another facility to account for those tasks
-    // returning and then execute the next task upon that event
-    jake.Task['utils:concat'].execute.apply(t_concat, [component.builddir + '/' + component.filenames.min, component.jsfiles]);
-
-    if (!component.skip.register) {
-        jake.Task['utils:register'].execute.apply(t_add, [component.builddir + '/' + component.filenames.min + 'wrapped', component.builddir + '/' + component.filenames.min]);
-    }
-    
-    jake.Task['utils:removelogging'].execute.apply(t_logger, [component.builddir + '/' + component.filenames.min, component.builddir + '/' + component.filenames.min + 'wrapped']);
-    
-    // TODO: uglify throws an exception when the javascript is just unparseable, handle this nicely.
-    jake.Task['utils:minify'].execute.apply(t_min, [component.builddir + '/' + component.filenames.min + '-min', component.builddir + '/' + component.filenames.min])
-
-}, true);
-
+// TODO: maybe re-instate file tasks to detect which files need to be built
 
 /**
  * Each build task corresponds to a utils:task.
@@ -148,7 +137,6 @@ namespace('build', function() {
     task('clean', function() {
         jake.Task['utils:clean'].execute();
     });
-    
     
     desc('Build:concat (SYNC)');
     task('concat', function() {
@@ -176,6 +164,26 @@ namespace('build', function() {
     task('minify', function() {
         jake.Task['utils:minify'].execute();
     });
+    
+    // build:skins
+    desc('Build:skins (SYNC)');
+    task('skins', function() {
+        var t_concat = jake.Task['utils:concat'];
+        t_concat.execute.apply(t_concat, [component.builddir + '/assets/skins/sam/' + component.component + '.css', [
+                component.assets.base + '/' + component.component + '-core.css',
+                component.assets.base + '/skins/sam/' + component.component + '.css'
+        ]]);
+    
+        // CSS minify output
+    });
+    
+    // 
+    // 
+    // build:rollup
+    // build:langs
+    // build:prepend - after register (usually for license?)
+    // build:append - after register
+    // build:fixcrlf ?
 });
 
 /**
@@ -188,6 +196,8 @@ namespace('utils', function() {
      * 
      * The first argument is the destination variable (string).
      * The second argument is the array of source files, using fully qualified paths.
+     * 
+     * TODO: make concat work for files or strings
      */
     desc('Concatenate files (SYNC)');
     task('concat', function() {
@@ -200,7 +210,6 @@ namespace('utils', function() {
         console.log('\tTo: buffer');
 
         for (var i = 0; i < inputFiles.length; i++) {
-            // TODO investigate using buffer/stream instead of string concatenation?
             output += fs.readFileSync(inputFiles[i]); 
         }
 
@@ -218,32 +227,68 @@ namespace('utils', function() {
      */
     desc('Wrap module in YUI.add statement');
     task('register', function() {
-        var output,
-        requiresQuoted = component.requires.map(function(v) {
-            return "'" + v.trim() + "'";
-        }),
-        data = component.files.concat, template;
-           
-        // TODO: consider a tiny templating engine to take care of registration?
-        // this would be closer to the YUI Builder implementation
-        template = [
-            "YUI.add('",
-            component.component,
-            "', function(Y) {\n\n",
-            data,
-            "\n\n",
-            "}, '",
-            component.version, // TODO: add component.details such as skinnable/requires etc.
-            "', { requires : [",
-            requiresQuoted.join(","),
-            "] });"
-        ],
-        output = template.join('');  
+        var propToDetail = function(key, values) {
+                values = values.split(',').map(function(v){ return "'" + v.trim() + "'";});
+                return key + ':[' + values.join(',') + ']' 
+            },
+            //data = component.files.concat, 
+            template = fs.readFileSync('../../builder/files/moduletemplate.mustache', 'utf8'),
+            view = {
+                component : component['component'],
+                yuivar : 'Y',
+                version : component['version'],
+                code : component['files']['concat'],
+                details : []
+            },
+            i, detail;
+            
+        for (i in component.details_arrays) {
+            detail = component.details_arrays[i];
 
-        component.files.registered = output;
+            if (component.details[detail] !== undefined) {
+                view.details.unshift(propToDetail(detail, component.details[detail]));
+            }
+        }
+        
+        view.details = ',{' + view.details.join(', ') + '}';
+        if (component.details.skinnable === true) {
+            view.details += ', skinnable:true';
+        }
 
+        component.files.registered = Mustache.to_html(template, view);
         console.log('Registered module');
     });
+    
+    
+// before mustache    
+//    task('register', function() {
+//        var output,
+//        requiresQuoted = component.requires.map(function(v) {
+//            return "'" + v.trim() + "'";
+//        }),
+//        data = component.files.concat, template;
+//           
+//        // TODO: consider a tiny templating engine to take care of registration?
+//        // this would be closer to the YUI Builder implementation
+//        template = [
+//            "YUI.add('",
+//            component.component,
+//            "', function(Y) {\n\n",
+//            data,
+//            "\n\n",
+//            "}, '",
+//            component.version, // TODO: add component.details such as skinnable/requires etc.
+//            "', { requires : [",
+//            requiresQuoted.join(","),
+//            "] });"
+//        ],
+//        output = template.join('');  
+//
+//        component.files.registered = output;
+//
+//        console.log('Registered module');
+//    });
+
     
     /**
      * Replace all logging statements in the raw source file.
@@ -307,6 +352,7 @@ namespace('utils', function() {
             ast = pro.ast_mangle(ast);
             ast = pro.ast_squeeze(ast);
         } catch (e) {
+            console.log(e.stack);
             fail('The minify task failed, most likely the source file was unparseable. Please check your syntax. Error: ' + e.message);
         }
        
