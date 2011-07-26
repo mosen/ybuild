@@ -1,2 +1,2 @@
 var builddir = '../../builder', 
-    builder = require(builddir + '/builder.js');
+    builder = require('yui-community-builder');

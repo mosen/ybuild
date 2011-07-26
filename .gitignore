@@ -4,3 +4,4 @@
 /builder/node_modules/.bin/
 /builder/node_modules/jslint/node_modules/.bin/
 /builder/node_modules/
+/.idea/

@@ -9,7 +9,7 @@
  * TODO: evaluate the possibility of using SOME asynchronous tasks.
  * TODO: prepend / append tasks
  * TODO: consider jshint
- * TODO: consider csslint
+ * TODO: some way of not referring to the component global inside a task.
  * 
  * Relevant samey projects:
  * https://github.com/dsimard/ready.js
@@ -29,11 +29,7 @@ Mustache = require('Mustache'),
 basedir = '.',
 jsbasedir = basedir + '/js',
 
-/**
-     * Component build specification
-     * 
-     * There are a few properties here which are just for convenience in later build tasks.
-     */
+// This specification should be converted to an object.
 component = {
     component : prop['component'] || 'component', // TODO: fail if not specified
     builddir : prop['component.builddir'] || basedir + '/build_tmp',
@@ -63,7 +59,8 @@ component = {
         min : "" // reduce size
     },
     assets : {
-        base : "./assets"
+        base : "./assets",
+        csslintoptions : {}
     },
     
     // Task definitions for file() type tasks, which ensure that we are only building changes.
@@ -112,8 +109,10 @@ task({
       , 'build:register'
       , 'build:removelogging'
       , 'build:minify'
+      , 'build:skins'
     ]}, function() {
     
+    // Changes before this are not committed to the file system, now we write out the files.
     fs.writeFileSync(component.builddir + '/' + component.filenames.core, component.files.raw, 'utf8');
     fs.writeFileSync(component.builddir + '/' + component.filenames.debug, component.files.registered, 'utf8');
     fs.writeFileSync(component.builddir + '/' + component.filenames.min, component.files.min, 'utf8');
@@ -133,6 +132,7 @@ directory(component.builddir);
  * paths or configuration names of the build file.
  */
 namespace('build', function() {
+
     desc('Build:clean (SYNC)');
     task('clean', function() {
         jake.Task['utils:clean'].execute();
@@ -140,7 +140,7 @@ namespace('build', function() {
     
     desc('Build:concat (SYNC)');
     task('concat', function() {
-        var t_concat = jake.Task['utils:concat'];
+        var t_concat = jake.Task['utils:stringconcat'];
         t_concat.execute.apply(t_concat, [component.files.concat, component.jsfiles]);
     });
     
@@ -153,6 +153,16 @@ namespace('build', function() {
     desc('Build:register (SYNC)');
     task('register', function() {
         jake.Task['utils:register'].execute();
+    });
+    
+    desc('Build:prepend (SYNC)');
+    task('prepend', function() {
+        // string concat?
+    });
+    
+    desc('Build:append (SYNC)');
+    task('append', function() {
+        // string concat?
     });
     
     desc('Build:removelogging (SYNC)');
@@ -168,21 +178,39 @@ namespace('build', function() {
     // build:skins
     desc('Build:skins (SYNC)');
     task('skins', function() {
-        var t_concat = jake.Task['utils:concat'];
-        t_concat.execute.apply(t_concat, [component.builddir + '/assets/skins/sam/' + component.component + '.css', [
+        console.log('Writing skins');
+        // dest = component.builddir + '/assets/skins/sam/' + component.component + '.css'
+        var destFile = component.builddir + '/' + component.component + '.css';
+        
+        var t_concat = jake.Task['utils:fileconcat'];
+        t_concat.execute.apply(t_concat, [destFile, [
                 component.assets.base + '/' + component.component + '-core.css',
-                component.assets.base + '/skins/sam/' + component.component + '.css'
+                component.assets.base + '/skins/sam/' + component.component + '-skin.css'
         ]]);
     
-        // CSS minify output
+        // CSS Lint (ASYNC)
+        var t_csslint = jake.Task['utils:csslint'];
+        t_csslint.execute.apply(t_csslint, [destFile]);
+    
+        var t_cssminify = jake.Task['utils:cssminify'];
+        t_cssminify.execute.apply(t_cssminify, [destFile]);
+        
+        fs.writeFileSync(component.builddir + '/' + component.component + '-min.css', component.assets.min, 'utf8');
     });
     
-    // 
-    // 
+    desc('Build:langs (SYNC)');
+    task('langs', function() {
+        // build:langs
+        // if="component.langs.exist"
+        // <mkdir dir="${component.builddir}/lang" />
+        // foreach (<addlang dir="${component.lang.base}" module="${component}" lang="@{lang}" dest="${component.builddir}/lang" />)
+        // <addlang dir="${component.lang.base}" module="${component}" lang="" dest="${component.builddir}/lang/" />
+        // see -> addlang        
+    });
+    
     // build:rollup
-    // build:langs
-    // build:prepend - after register (usually for license?)
-    // build:append - after register
+
+
     // build:fixcrlf ?
 });
 
@@ -192,15 +220,15 @@ namespace('build', function() {
 namespace('utils', function() {
     
     /**
-     * Concatenate a number of files to a destination file.
+     * Concatenate a number of files to a string.
      * 
      * The first argument is the destination variable (string).
      * The second argument is the array of source files, using fully qualified paths.
      * 
      * TODO: make concat work for files or strings
      */
-    desc('Concatenate files (SYNC)');
-    task('concat', function() {
+    desc('Concatenate files to string (SYNC)');
+    task('stringconcat', function() {
         var output = "",
         outputFile = arguments[0],
         inputFiles = arguments[1]; // Input files require full path
@@ -218,13 +246,31 @@ namespace('utils', function() {
         //fs.writeFileSync(outputFile, output, 'utf8');
         console.log('Done concatenating');  
     });
-
+    
     /**
-     * Register the module with a YUI.add() statement
+     * Concatenate a number of files to a destination file.
      * 
-     * of course we may need to find a templating library in order to
-     * do some more sophisticated builds, but for now the string join works.
+     * The first argument is the destination file.
+     * The second argument is the array of source files, using fully qualified paths.
      */
+    desc('Concatenate files to string (SYNC)');
+    task('fileconcat', function() {
+        var output = "",
+        outputFile = arguments[0],
+        inputFiles = arguments[1]; // Input files require full path
+        
+        console.log('Concatenating');
+        console.log('\tSource files: ' + inputFiles.join(','));
+        console.log('\tTo: ' + outputFile);
+
+        for (var i = 0; i < inputFiles.length; i++) {
+            output += fs.readFileSync(inputFiles[i]); 
+        }
+        
+        fs.writeFileSync(outputFile, output, 'utf8');
+        console.log('Done concatenating');  
+    });
+
     desc('Wrap module in YUI.add statement');
     task('register', function() {
         var propToDetail = function(key, values) {
@@ -258,37 +304,6 @@ namespace('utils', function() {
         component.files.registered = Mustache.to_html(template, view);
         console.log('Registered module');
     });
-    
-    
-// before mustache    
-//    task('register', function() {
-//        var output,
-//        requiresQuoted = component.requires.map(function(v) {
-//            return "'" + v.trim() + "'";
-//        }),
-//        data = component.files.concat, template;
-//           
-//        // TODO: consider a tiny templating engine to take care of registration?
-//        // this would be closer to the YUI Builder implementation
-//        template = [
-//            "YUI.add('",
-//            component.component,
-//            "', function(Y) {\n\n",
-//            data,
-//            "\n\n",
-//            "}, '",
-//            component.version, // TODO: add component.details such as skinnable/requires etc.
-//            "', { requires : [",
-//            requiresQuoted.join(","),
-//            "] });"
-//        ],
-//        output = template.join('');  
-//
-//        component.files.registered = output;
-//
-//        console.log('Registered module');
-//    });
-
     
     /**
      * Replace all logging statements in the raw source file.
@@ -369,4 +384,46 @@ namespace('utils', function() {
         
         console.log('Removed: ' + component.builddir);
     });
+    
+    desc('Lint css file ASYNC');
+    task('csslint', function() {
+        var inputFile = arguments[0],
+            cssfile,
+            csslint = require('csslint').CSSLint,
+            result;
+                
+        fs.readFile(inputFile, 'utf8', function(err, data) {
+            if (err) {
+                throw err;
+            }
+            
+            data = data.toString('utf8');
+            result = csslint.verify(data, component.assets.csslintoptions);
+            console.log(result);
+            
+            complete();
+        });
+    }, true);
+
+    desc('Minify css file');
+    task('cssminify', function() {
+        var inputFile = arguments[0],
+            cssString = fs.readFileSync(inputFile, 'utf8');
+            less = require('less'),
+            lessParser = new less.Parser;
+            
+        console.log(cssString);
+            
+        lessParser.parse(cssString, function(err, tree) {
+           var result;
+           
+           if (err) {
+               throw err;
+           }
+           
+           component.assets.min = tree.toCSS({ compress: true });
+           
+           complete();
+        });
+    }, true);
 });
