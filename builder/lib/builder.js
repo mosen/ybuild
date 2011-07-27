@@ -20,10 +20,11 @@
 
 // Dependencies
 var fs = require('fs'),
-path = require('path'),
-iniparser = require('iniparser'), // Used for backwards compatibility with ANT build.properties
-prop = iniparser.parseSync('build.properties'),
-Mustache = require('Mustache'),
+    path = require('path'),
+    iniparser = require('iniparser'), // Used for backwards compatibility with ANT build.properties
+    prop = iniparser.parseSync('build.properties'),
+    ju = require('./jake_utils.js'),
+    Mustache = require('Mustache'),
 
 // Directories
 basedir = '.',
@@ -140,8 +141,11 @@ namespace('build', function() {
     
     desc('Build:concat (SYNC)');
     task('concat', function() {
-        var t_concat = jake.Task['utils:stringconcat'];
-        t_concat.execute.apply(t_concat, [component.files.concat, component.jsfiles]);
+        console.log('Concatenating files');
+        component.files.concat = ju.concatSync(null, component.jsfiles);
+        
+        //var t_concat = jake.Task['utils:stringconcat'];
+        //t_concat.execute.apply(t_concat, [component.files.concat, component.jsfiles]);
     });
     
     desc('Build:lint (SYNC)');
@@ -181,12 +185,19 @@ namespace('build', function() {
         console.log('Writing skins');
         // dest = component.builddir + '/assets/skins/sam/' + component.component + '.css'
         var destFile = component.builddir + '/' + component.component + '.css';
-        
-        var t_concat = jake.Task['utils:fileconcat'];
-        t_concat.execute.apply(t_concat, [destFile, [
-                component.assets.base + '/' + component.component + '-core.css',
-                component.assets.base + '/skins/sam/' + component.component + '-skin.css'
-        ]]);
+  
+        ju.concatSync(destFile, [
+            component.assets.base + '/' + component.component + '-core.css',
+            component.assets.base + '/skins/sam/' + component.component + '-skin.css'           
+        ]);
+  
+//        var t_concat = jake.Task['utils:fileconcat'];
+//        t_concat.execute.apply(t_concat, [destFile, [
+//                component.assets.base + '/' + component.component + '-core.css',
+//                component.assets.base + '/skins/sam/' + component.component + '-skin.css'
+//        ]]);
+    
+        // copy core to core in dest
     
         // CSS Lint (ASYNC)
         var t_csslint = jake.Task['utils:csslint'];
@@ -195,7 +206,7 @@ namespace('build', function() {
         var t_cssminify = jake.Task['utils:cssminify'];
         t_cssminify.execute.apply(t_cssminify, [destFile]);
         
-        fs.writeFileSync(component.builddir + '/' + component.component + '-min.css', component.assets.min, 'utf8');
+        fs.writeFileSync(component.builddir + '/' + component.component + '.css', component.assets.min, 'utf8');
     });
     
     desc('Build:langs (SYNC)');
