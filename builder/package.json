@@ -1,22 +1,49 @@
-{     "name" : "yui-community-builder"
-    , "version" : "0.0.1beta"
-    , "description" : "A YUI module builder for node"
-    , "keywords" : ["YUI", "builder", "jake"]
-    , "author" : { "name" : "Mosen" 
-                 , "email" : "none"
-                 , "url" : "https://github.com/mosen" }
-    , "files" : [ "builder.js"
-                , "files" ]
-    , "main" : "./lib/builder.js"
-    , "repository" : { "type" : "git"
-                     , "url" : "http://github.com/mosen/yui-community-node-builder" }
-    , "dependencies" : { "jake" : ">=0.1.14"
-                       , "file" : ">=0.1.1"
-                       , "mkdirp" : ">-0.0.5"
-                       , "jslint" : ">=0.1.0"
-                       , "csslint" : ">=0.4.0"
-                       , "less" : ">=1.1.4"
-                       , "uglify-js" : ">=1.0.6"
-                       , "mustache" : ">=0.3.1-dev" }
-    , "private" : true
+{
+    "name" : "yui-community-builder"
+    , 
+    "version" : "0.0.1beta"
+    , 
+    "description" : "A YUI module builder for node"
+    , 
+    "keywords" : ["YUI", "builder", "jake"]
+    , 
+    "author" : {
+        "name" : "Mosen" 
+        , 
+        "email" : "none"
+        , 
+        "url" : "https://github.com/mosen"
+    }
+    , 
+    "files" : [ "builder.js"
+    , "files" ]
+    , 
+    "main" : "./lib/builder.js"
+    ,
+    "bin": { "yuibuild": "./bin/cli.js" },
+    "repository" : {
+        "type" : "git"
+        , 
+        "url" : "http://github.com/mosen/yui-community-node-builder"
+    }
+    , 
+    "dependencies" : {
+        "jake" : ">=0.1.14"
+        , 
+        "file" : ">=0.1.1"
+        , 
+        "mkdirp" : ">=0.0.5"
+        , 
+        "jslint" : ">=0.1.0"
+        , 
+        "csslint" : ">=0.4.0"
+        , 
+        "less" : ">=1.1.4"
+        , 
+        "uglify-js" : ">=1.0.6"
+        , 
+        "mustache" : ">=0.3.1-dev"
+    }
+    , 
+    "private" : true
 }
