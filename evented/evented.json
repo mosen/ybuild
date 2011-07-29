@@ -1,0 +1,19 @@
+{
+    "spinner" : {
+        "dependencies" : [
+            { "corefile" : {
+                "tasks" : [
+                    "concat" : {
+                        destFile : "spinner-core.js",
+                        source
+                    }
+                ]
+            }},
+            { "debugfile" },
+            { "minfile" }
+        ],
+        "tasks" : [
+            "deploy" : { deployOptions }
+        ]
+    }
+}

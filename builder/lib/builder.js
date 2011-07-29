@@ -48,6 +48,27 @@ task({
     console.log('Module has been built');
 });
 
+desc('Build in local directory');
+task({
+    'local' : [
+        'build:clean'
+      , 'build:concat'
+      , 'build:lint'
+      , 'build:register'
+      , 'build:removelogging'
+      , 'build:minify'
+      , 'build:skins'        
+    ]}, function() {
+    
+    // Changes before this are not committed to the file system, now we write out the files.
+    fs.writeFileSync('./' + component.buildDir + '/' + component.getFilename('core'), component.buildStrings.raw, 'utf8');
+    fs.writeFileSync('./' + component.buildDir + '/' + component.getFilename('debug'), component.buildStrings.registered, 'utf8');
+    fs.writeFileSync('./' + component.buildDir + '/' + component.getFilename('min'), component.buildStrings.min, 'utf8');
+    
+    console.log('Module has been built');    
+})
+
+
 desc('Create temporary build directory to hold build files at each stage of the process.');
 directory('./' + component.buildDir);
 
@@ -156,7 +177,7 @@ namespace('build', function() {
     // build:skins
     desc('Build:skins (ASYNC)');
     task('skins', function() {
-        var destFile = './' + component.buildDir + '/' + component.name + '.css',
+        var destFile = '.' + component.buildDir + '/' + component.name + '.css',
             coreFile = component.getSkinCoreFilename(),
             skinFile = component.getSkinFilename();
             
@@ -170,7 +191,7 @@ namespace('build', function() {
     
         // copy core to core in dest
         // TODO: parse this and make pretty?
-        ju.copy(component.getSkinCoreFilename(), component.buildDir + '/' + component.component + '-core.css')
+        ju.copy(component.getSkinCoreFilename(), './' + component.buildDir + '/' + component.component + '-core.css')
     
         // CSS Lint (ASYNC)
         ju.cssLint({source: cssConcat}, null, function(result) {

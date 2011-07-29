@@ -15,11 +15,14 @@ var args = process.argv.slice(2)
   , program = new Program()
   , Loader = require('jake/lib/loader.js').Loader
   , loader = new Loader()
-//  , pkg = JSON.parse(fs.readFileSync(__dirname + '/../package.json').toString())
   , opts
-  , envVars;
+  , envVars
+  , events = require('events')
+  , Validator = require('../lib/validator').Validator
+  , validator = new Validator()
+  , jakeFilename = 'Jakefile.js';
 
-jake.version = 'runner';
+jake.version = 'yuibuild';
 
 global.jake = jake;
 
@@ -27,34 +30,54 @@ process.addListener('uncaughtException', function (err) {
   program.handleErr(err);
 });
 
-program.parseArgs(args);
+//console.log(args);
 
-if (!program.preemptiveOption()) {
-  opts = program.opts
-  envVars = program.envVars;
+//validator.on('validated', function(dirs) {
+//   console.log('Building:');
+//   dirs.forEach(function(d) {
+//      console.log('\t'+d); 
+//   });
+//});
+//
+//
+//if (args.length === 0) {
+//    
+//} else {
 
-  // Globalize top-level API methods (e.g., `task`, `desc`)
-  for (var p in api) {
-    global[p] = api[p];
-  }
-
-  // Enhance env with any env vars passed in
-  for (var p in envVars) { process.env[p] = envVars[p]; }
-
-  loader.load(opts.jakefile);
-
-  // Set working dir
-  var dirname = opts.directory;
-  if (dirname) {
-    process.chdir(dirname);
-  }
-
-  jake.parseAllTasks();
-
-  if (opts.tasks) {
-    jake.showAllTaskDescriptions(opts.tasks);
-  }
-  else {
-    jake.runTask(program.taskName || 'default', program.taskArgs, true);
-  }
+    
+    // iterate args
+    // exclude non-folders
+    // exclude folders that don't have a build specification
 }
+
+//program.parseArgs(args);
+//
+//if (!program.preemptiveOption()) {
+//  opts = program.opts
+//  envVars = program.envVars;
+//
+//  // Globalize top-level API methods (e.g., `task`, `desc`)
+//  for (var p in api) {
+//    global[p] = api[p];
+//  }
+//
+//  // Enhance env with any env vars passed in
+//  for (var p in envVars) { process.env[p] = envVars[p]; }
+//
+//  loader.load(opts.jakefile);
+//
+//  // Set working dir
+//  var dirname = opts.directory;
+//  if (dirname) {
+//    process.chdir(dirname);
+//  }
+//
+//  jake.parseAllTasks();
+//
+//  if (opts.tasks) {
+//    jake.showAllTaskDescriptions(opts.tasks);
+//  }
+//  else {
+//    jake.runTask(program.taskName || 'default', program.taskArgs, true);
+//  }
+//}

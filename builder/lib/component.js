@@ -18,6 +18,8 @@
  * }
  * 
  */
+var globalDefaults = require('./defaults').config;
+
 exports.factory = function(sourceType, sourceOptions) {
     var buildDir = '/build_tmp';
     
@@ -29,6 +31,7 @@ exports.factory = function(sourceType, sourceOptions) {
                 p = iniparser.parseSync(sourceOptions.buildProperties);
                 component = new Component();
             
+            component._globalConfig = globalDefaults;
             component.name = p['component'];
             component.version = p['version'] || '1.0.0';
             component.buildDir = p['component.builddir'] || buildDir;
@@ -58,15 +61,25 @@ exports.factory = function(sourceType, sourceOptions) {
             // new component, set values
             // return new component
             break;
+        
+        // Just return the component build specification, allow the end user script to modify properties
+        default:
+            var component = new Component();
+            component._globalConfig = globalDefaults;
+            return component;
+            break;
     }
 }
 
-var Component = function() {
-    
+var Component = function(config) {
+    this._globalConfig = config;
 };
 
 Component.prototype = {
+    // Global configuration defaults
+    _globalConfig : {},
     
+    // component.component
     name : '',
     
     version : '',
