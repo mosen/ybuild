@@ -1,1 +1,0 @@
-YUI.add("component",function(a){var b=1,c=2,c=3},"1.0.0")
