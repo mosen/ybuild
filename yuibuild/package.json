@@ -1,5 +1,5 @@
 {
-    "name" : "yui-community-builder", 
+    "name" : "yuibuild", 
     "version" : "0.0.1beta", 
     "description" : "A YUI component builder for node", 
     "keywords" : ["YUI", "build", "buildy"], 
@@ -19,7 +19,7 @@
         "url" : "http://github.com/mosen/yui-community-node-builder"
     }, 
     "dependencies" : {
-        "buildy" : "*"
+        
     }, 
     "private" : true
 }
