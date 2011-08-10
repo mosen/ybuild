@@ -1,5 +1,5 @@
 /**
- * component build specification object
+ * YUI component build specification object
  * 
  * @method factory
  * @param sourceType {String} One of 'ant', 'json'
@@ -13,13 +13,12 @@
  * }
  * 
  * sourceOptions (json) {
- *  buildFile : 'build.json',
- *  baseDir : '/path/to/module'
+ *  buildFile : 'build.json'
  * }
  * 
  */
-var globals = require('./defaults').config;
-var path   = require('path');
+var globals = require('./defaults').config,
+    path    = require('path');
 
 exports.factory = function(sourceType, sourceOptions) {
     
@@ -90,24 +89,19 @@ Component.prototype = {
     getFilename : function(type) {
         switch (type) {
             case 'core':
-                return this._baseDir + '/' + this._config.buildDir + '/' + this._config.name + '.js';
+                return path.join(this._baseDir, this._config.buildDir, this._config.name + '.js');
                 break;
-            case 'debug':
-                return this._baseDir + '/' + this._config.buildDir + '/' + this._config.name + '-debug.js';
-                break;
-            case 'min':
-                return this._baseDir + '/' + this._config.buildDir + '/' + this._config.name + '-min.js';
-                break;
+            default:
+                return path.join(this._baseDir, this._config.buildDir, this._config.name + '-' + type + '.js');
         }
     },
     
+    // Get component details as single-quoted, comma-delimited string
     getDetailString : function(detail) {
         if (this._config.details[detail] !== null && this._config.details[detail].length > 0) {
-            var quotedList = this._config.details[detail].map(function(v) {
+            return this._config.details[detail].map(function(v) {
                return "'" + v.trim() + "'"; 
-            });
-            
-            return quotedList.join(', ');
+            }).join(', ');
         } else {
             return null;
         }
@@ -117,13 +111,13 @@ Component.prototype = {
         var details = [],
             detail;
         
-        for (var prop in this.arrayDetails) {
-            detail = this.getDetailString(this.arrayDetails[prop]);
+        this.arrayDetails.forEach(function(v) {
+            detail = this.getDetailString(v);
             
             if (detail !== null) {
-                details.push(this.arrayDetails[prop] + ': [' + detail + ']');
+                details.push(v + ': [' + detail + ']');
             }
-        }
+        }, this);
         
         if (this._config.details.skinnable === true) {
             details.push('skinnable: true');
@@ -135,26 +129,23 @@ Component.prototype = {
     
     // Grab source files with relative paths appended
     getSourceFiles : function() {
-        var dirPrefix = this._baseDir || './',
-            sourceDir = this._config.sourceDir,
-            relativeSources = this._config.sourceFiles.map(function(v) {
-                return dirPrefix + '/' + sourceDir + '/' + v; 
-            });
-        
-        return relativeSources;
+        return this._config.sourceFiles.map(function(v) {
+            return path.join(this._baseDir, this._config.sourceDir, v); 
+        }, this);
     },
     
-    getSkinFilename : function(prefix) {
-        var dirPrefix = prefix || './';
-        
-        return dirPrefix + this._config.assetsDir + '/skins/sam/' + this.name + '-skin.css';
+    // Grab named skin filename location, or default to 'sam'
+    getSkinFilename : function(skin) {
+        skin = skin || 'sam';
+        return path.join(this._baseDir, this._config.assetsDir, skin, this._config.name + '-skin.css');
     },
     
-    getSkinCoreFilename : function(prefix) {
-        var dirPrefix = prefix || './';
-        
-        return dirPrefix + this._config.assetsDir + '/' + this.name + '-core.css';
+    // Grab core skin filename
+    getSkinCoreFilename : function() {
+        return path.join(this._baseDir, this._config.assetsDir, this._config.name + '-core.css');
     },
+    
+    // TODO: other assets
     
     // These details are treated as arrays
     arrayDetails : ['use', 'supersedes', 'requires', 'optional', 'after', 'lang']

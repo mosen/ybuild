@@ -1,21 +1,21 @@
 {
-    "name" : "component",
-    "type" : "js",
+    "name"    : "component",
+    "type"    : "js",
     "version" : "1.0.0",
-    "skip" : {
-        "clean" : false,
+    "skip"    : {
+        "clean"    : false,
         "register" : false,
-        "lint" : false,
-        "logger" : false
+        "lint"     : false,
+        "logger"   : false
     },
-    "sourceDir" : "js",
+    "sourceDir"   : "js",
     "sourceFiles" : [
         "component.js"
     ],
-    "buildDir" : "build",
+    "buildDir"  : "../build",
     "assetsDir" : "assets",
-    "tools" : {
-        "jslint" : {
+    "tools"     : {
+        "jslint"  : {
             "jslint option" : null
         },
         "csslint" : {
@@ -23,13 +23,13 @@
         }
     },
     "details" : {
-        "use" : null,      
+        "use"        : null,      
         "supersedes" : null,
-        "requires" : ["base"],
-        "optional" : null,
-        "after" : null,
-        "after_map" : {},
-        "lang" : ["en-US"],
-        "skinnable" : false
+        "requires"   : ["base"],
+        "optional"   : null,
+        "after"      : null,
+        "after_map"  : {},
+        "lang"       : ["en-US"],
+        "skinnable"  : false
     }
 }

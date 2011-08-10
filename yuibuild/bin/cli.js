@@ -10,25 +10,47 @@ var path   = require('path'),
 var buildFileName = /build\.json$/;
 
 var help = [
-    "usage: yuibuild [options]",
+    "usage: yuibuild [DIR, ...] [options]",
     "",
     "options:",
     "  -v, --verbose     Verbose output",
-    "  -h, --help        This is it"
+    "  -h, --help        This is the help",
+    "",
+    ""
 ].join('\n');
 
 var arg, 
-    args = [], 
+    args = [], // DIRs
     argv = process.argv.slice(2),
-    options;
+    options = {};
 
-if (args.length === 0 || options.watch) {
+while (arg = argv.shift()) {
+    if (arg === __filename) { continue }
+    
+    if (arg[0] !== '-') {
+        args.push(arg);
+    } else {
+        switch(arg) {
+            case 'v':
+            case 'verbose':
+                options.verbose = true;
+                break;
+            
+            case 'help':
+            case 'h':
+                console.log(help);
+                process.exit(0);
+                break;
+        } 
+    }
+}
+
+if (args.length === 0) {
     console.log('yuibuild alpha');
     
     var buildPaths = paths('.');
     buildPaths.forEach(function(f) {
         var buildComponent = component.factory('json', { buildFile: f });
-        console.log(buildComponent);
         var builder = new Builder(buildComponent);
         builder.run();
     })

@@ -18,3 +18,28 @@ Build.json format
 -----------------
 
 The build.json file format describes a YUI3.x component in JSON format.
+
+Use
+---
+
+yuibuild can be used in one of two ways, to build a single module, to a local
+directory, or to build a group of modules.
+
+The two use cases will be:
+
+*cwd = module-name*
+
+> yuibuild
+Builds the current module into ./build
+
+OR
+
+*cwd = parent directory*
+
+> yuibuild *
+
+OR
+
+> yuibuild gallery-*
+
+Or some glob, to get matching directories containing build files.
