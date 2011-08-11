@@ -15,6 +15,10 @@ function Builder(component) {
     var cssQueue = new Queue('build assets:' + this._component._config.name);
     this._createSkinQueue(cssQueue);
     this._taskQueues.push(cssQueue);
+    
+    var assetsQueue = new Queue('copy extra assets:' + this._component._config.name);
+    this._createAssetsQueue(assetsQueue);
+    this._taskQueues.push(assetsQueue);
 }
 
 Builder.prototype = {
@@ -51,6 +55,7 @@ Builder.prototype = {
         .task('fork', {
             'debug:' : function(b) {
                 this.task('write', {name: filename_debug})
+                    .task('log')
                     .run(b);
             },
             'raw:' : function(b) {
@@ -75,44 +80,52 @@ Builder.prototype = {
     },
     
     _createSkinQueue : function(q) {
-        var component = this._component,
-            filename_skin = component.getSkinFilename('sam'),
-            filename_core = component.getSkinCoreFilename(),
-            filename_out = 'test.css';
+        var component         = this._component,
+            filename_skin     = component.getSkinFilename('sam'),
+            filename_core     = component.getSkinCoreFilename(),
+            filename_min_out  = component.getSkinFilename('sam', true);
         
         console.log('Outputting files:');
-        console.log("\tcore: " + filename_core);
-        console.log("\tmin: " + filename_skin);
+        console.log("\tmin: " + filename_min_out);
         
         q.task('files', [filename_skin, filename_core])
          .task('concat')
          .task('csslint')
-         .task('fork', {
-             'raw' : function(b) {
-                 //this.task('write', { name: filename_core})
-             },
-             'minified' : function(b) {
-                 this.task('cssminify').task('write', {name: filename_out}).run(b);
-             }
-          });
+         .task('cssminify')
+         .task('log')
+         .task('write', {name: filename_min_out});
+    },
+    
+    _createAssetsQueue : function(q) {
+        var component     = this._component,
+            assets_source = component.getAssetsDir(),
+            assets_dest   = component.getAssetsDir(true);
         
+        console.log('Copying assets:');
+        console.log("\tfrom: " + assets_source);
+        console.log("\tto: " + assets_dest);
         
-//            nq.task('files', ['./css/test1.css', './css/test2.css'])
-//        .task('concat')
-//        .task('csslint')
-//        .task('fork', {
-//            'raw css version' : function(b) {
-//                this.task('write', { name: './build/test.css' }).run(b);
-//            },
-//            'minified css version' : function(b) {
-//                this.task('cssminify').task('write', { name: './build/test-min.css' }).run(b);
-//            }
-//        }).run(new Buildy());
+        q.task('copy2', {
+           src: [
+                assets_source + '/*'
+           ],
+           dest: assets_dest,
+           recursive: true,
+           excludes: [
+               path.join(component._baseDir, 'assets/skins/')
+           ]
+        });
     },
     
     run : function() {
         this._taskQueues.forEach(function(q) {
-            q.run(this._buildy);
+            var worker = new Buildy();
+            // TODO: reporter
+            q.on('taskFailed', function(result) {
+               console.log('Task failed in queue:');
+               console.log(result); 
+            });
+            q.run(worker);
         }, this);
     }
 };

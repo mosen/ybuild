@@ -86,6 +86,14 @@ Component.prototype = {
     // Component configuration
     _config : {},
     
+    /**
+     * Get the output filename for a given build type.
+     * 
+     * @method getFilename
+     * @param type {String} Type of file, usually one of "core", "debug", "min"
+     * @return {String} Absolute path to the build file
+     * @public
+     */
     getFilename : function(type) {
         switch (type) {
             case 'core':
@@ -135,14 +143,30 @@ Component.prototype = {
     },
     
     // Grab named skin filename location, or default to 'sam'
-    getSkinFilename : function(skin) {
+    // build = true means, prepend build directory
+    getSkinFilename : function(skin, build) {
         skin = skin || 'sam';
-        return path.join(this._baseDir, this._config.assetsDir, skin, this._config.name + '-skin.css');
+        
+        return path.join(this._baseDir, 
+                        (!build || this._config.buildDir), 
+                        this._config.assetsDir, 
+                        'skins', 
+                        skin, 
+                        this._config.name + '-skin.css');
     },
     
     // Grab core skin filename
-    getSkinCoreFilename : function() {
-        return path.join(this._baseDir, this._config.assetsDir, this._config.name + '-core.css');
+    getSkinCoreFilename : function(build) {
+        return path.join(this._baseDir,
+                         (!build || this._config.buildDir),
+                         this._config.assetsDir, 
+                         this._config.name + '-core.css');
+    },
+    
+    getAssetsDir : function(build) {
+        return path.join(this._baseDir,
+                        (!build || this._config.buildDir),
+                        this._config.assetsDir);
     },
     
     // TODO: other assets
