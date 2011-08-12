@@ -30,6 +30,6 @@
         "after"      : null,
         "after_map"  : {},
         "lang"       : ["en-US"],
-        "skinnable"  : false
+        "skinnable"  : true
     }
 }
