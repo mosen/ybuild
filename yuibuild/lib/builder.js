@@ -54,16 +54,15 @@ Builder.prototype = {
         q.task('files', component.getSourceFiles()) // all of these synchronous
         .task('concat')
         .task('jslint')
-//        .task('log')
-//        .task('template', {
-//            templateFile: module_template, 
-//            model: { 
-//                yuivar    : 'Y',
-//                component : component._config.name,
-//                version   : component._config.version,
-//                details   : component.getAllDetailsString()
-//            }
-//        })
+        .task('template', {
+            templateFile: module_template, 
+            model: { 
+                yuivar    : 'Y',
+                component : component._config.name,
+                version   : component._config.version,
+                details   : component.getAllDetailsString()
+            }
+        })
         .task('fork', {
             'debug:' : function(b) {
                 this.task('write', { name: filename_debug })
@@ -108,7 +107,6 @@ _createSkinQueue : function(q) {
     .task('concat')
     .task('csslint')
     .task('cssminify')
-    .task('log')
     .task('write', {
         name: filename_min_out
     });
@@ -123,7 +121,7 @@ _createAssetsQueue : function(q) {
     console.log("\tfrom: " + assets_source);
     console.log("\tto: " + assets_dest);
         
-    q.task('copy2', {
+    q.task('copy', {
         src: [
         assets_source + '/*'
         ],
@@ -138,13 +136,12 @@ _createAssetsQueue : function(q) {
 run : function() {
     this._taskQueues.forEach(function(q) {
         var worker = Buildy.factory(Buildy.TYPES.STRING, '');
-        // TODO: reporter
+        // TODO: Create a reporter object which reports on these
         q.on('taskFailed', function(result) {
-            console.log('Task failed in queue:');
-            console.log(result); 
+            console.log('Task failed in queue');
         });
         q.on('taskComplete', function(result) {
-            console.log('Task finished in queue');
+            console.log('Task complete in queue');
         });
         q.run(worker);
     }, this);
