@@ -44,12 +44,13 @@ Builder.prototype = {
         component_ver   = component._config.version,
         component_detail= component.getAllDetailsString();
             
-        console.log('Building for ' + component_name + ' v' + component_ver);
+        console.log('Building component: ' + component_name + ' v' + component_ver);
         //console.log(component_detail);
         console.log('Outputting files:');
         console.log("\tdebug: " + filename_debug);
         console.log("\tcore: " + filename_core);
         console.log("\tmin: " + filename_min);
+        console.log("Builder output follows...");
         
         q.task('files', component.getSourceFiles()) // all of these synchronous
         .task('concat')
@@ -64,25 +65,25 @@ Builder.prototype = {
             }
         })
         .task('fork', {
-            'debug:' : function(b) {
+            'debug code' : function(b) {
                 this.task('write', { name: filename_debug })
                     .task('log')
                     .run(b);
             },
-            'raw:' : function(b) {
+            'core code' : function(b) {
                 this.task('replace', { 
                     regex: '^.*?(?:logger|Y.log).*?(?:;|\\).*;|(?:\r?\n.*?)*?\\).*;).*;?.*?\r?\n', 
                     replace: '', 
                     flags: 'mg'
                 })
                 .task('fork', {
-                    'raw:write' : function(b) {
+                    'write core' : function(b) {
                         this.task('write', {
                             name: filename_core
                         })
                         .run(b);
                     },
-                    'minify:' : function(b) { 
+                    'minified code' : function(b) { 
                         this.task('minify')
                         .task('write', {
                             name: filename_min
@@ -136,13 +137,6 @@ _createAssetsQueue : function(q) {
 run : function() {
     this._taskQueues.forEach(function(q) {
         var worker = Buildy.factory(Buildy.TYPES.STRING, '');
-        // TODO: Create a reporter object which reports on these
-        q.on('taskFailed', function(result) {
-            console.log('Task failed in queue');
-        });
-        q.on('taskComplete', function(result) {
-            console.log('Task complete in queue');
-        });
         q.run(worker);
     }, this);
 }
