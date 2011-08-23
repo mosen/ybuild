@@ -16,10 +16,10 @@
     "bin": { "yuibuild": "./bin/cli.js" },
     "repository" : {
         "type" : "git", 
-        "url" : "http://github.com/mosen/yui-community-node-builder"
+        "url" : "http://github.com/mosen/yuibuild"
     }, 
     "dependencies" : {
-        
+         "buildy" : "https://github.com/mosen/buildy/tarball/master"
     }, 
     "private" : true
 }
