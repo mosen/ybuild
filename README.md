@@ -19,6 +19,51 @@ Build.json format
 
 The build.json file format describes a YUI3.x component in JSON format.
 
+_Example_
+
+The following is an example from a gallery module i wrote.
+Note that not all properties are required, notably you can omit skip, tools and details.
+(Though you will probably want to keep the requires and skinnable properties around)
+
+```javascript
+
+{
+    "name"    : "gallery-datatable-ml-dd",
+    "type"    : "js",
+    "version" : "1.0.0",
+    "skip"    : {
+        "clean"    : false,
+        "register" : false,
+        "lint"     : false,
+        "logger"   : false
+    },
+    "sourceDir"   : "js",
+    "sourceFiles" : [
+        "dtml-dd.js"
+    ],
+    "buildDir"  : "../../build/gallery-datatable-ml-dd",
+    "assetsDir" : "assets",
+    "tools"     : {
+        "jslint"  : {
+            "jslint option" : null
+        },
+        "csslint" : {
+            "csslint option" : null
+        }
+    },
+    "details" : {
+        "use"        : null,
+        "supersedes" : null,
+        "requires"   : ["gallery-datatable-ml"],
+        "optional"   : null,
+        "after"      : null,
+        "after_map"  : {},
+        "skinnable"  : true
+    }
+}
+
+```
+
 Use
 ---
 

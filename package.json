@@ -19,7 +19,6 @@
         "url" : "http://github.com/mosen/yuibuild"
     }, 
     "dependencies" : {
-         "buildy" : "https://github.com/mosen/buildy/tarball/master"
     }, 
     "private" : true
 }
