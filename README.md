@@ -10,11 +10,10 @@ its own file format for specifying how a component should be built.
 Directory structure
 -------------------
 
-The directory structure is the same as YUI Builder with the exception of the
-build.xml and build.properties files. yuibuild has been written with backwards
-compatibility for these files, but also establishes a new file *build.json*
+The directory structure is the same as YUI Builder (https://github.com/yui/builder) with the exception of the
+build.xml and build.properties files. yuibuild uses a *build.json* file instead.
 
-Build.json format
+build.json format
 -----------------
 
 The build.json file format describes a YUI3.x component in JSON format.
@@ -28,7 +27,7 @@ Note that not all properties are required, notably you can omit skip, tools and 
 ```javascript
 
 {
-    "name"    : "gallery-datatable-ml-dd",
+    "name"    : "yui-module-name",
     "type"    : "js",
     "version" : "1.0.0",
     "skip"    : {
@@ -39,9 +38,9 @@ Note that not all properties are required, notably you can omit skip, tools and 
     },
     "sourceDir"   : "js",
     "sourceFiles" : [
-        "dtml-dd.js"
+        "module.js"
     ],
-    "buildDir"  : "../../build/gallery-datatable-ml-dd",
+    "buildDir"  : "../../build/yui-module-name",
     "assetsDir" : "assets",
     "tools"     : {
         "jslint"  : {
@@ -54,7 +53,7 @@ Note that not all properties are required, notably you can omit skip, tools and 
     "details" : {
         "use"        : null,
         "supersedes" : null,
-        "requires"   : ["gallery-datatable-ml"],
+        "requires"   : ["base"],
         "optional"   : null,
         "after"      : null,
         "after_map"  : {},
@@ -63,6 +62,51 @@ Note that not all properties are required, notably you can omit skip, tools and 
 }
 
 ```
+
+build.json reference
+--------------------
+
+`name`
+
+Name of the YUI module. Will be used in YUI().add() so this is what
+the loader will refer to.
+
+`type`
+
+One of "js" or "css". The type of component we are building.
+
+`version`
+
+Normally filled with the string "@VERSION@", might be used in building yui itself? *Needs clarification*
+
+`skip`
+
+A list of tasks to skip in the build process.
+
+`sourceDir`
+
+Relative directory to the source files.
+
+`sourceFiles`
+
+Array of filenames to include when building the module.
+
+`buildDir`
+
+Directory where the built files will reside (relative to the module directory).
+
+`assetsDir`
+
+Relative directory to the module assets.
+
+`tools`
+
+Hash containing options passed to specific tasks.
+Eg. lint options, minify options.
+
+`details`
+
+Details which the loader will use to determine the loading order and requirements.
 
 Use
 ---
