@@ -7,11 +7,29 @@ its own file format for specifying how a component should be built.
 
 *Documentation under construction*
 
-Directory structure
+directory structure
 -------------------
 
 The directory structure is the same as YUI Builder (https://github.com/yui/builder) with the exception of the
 build.xml and build.properties files. yuibuild uses a *build.json* file instead.
+
+```
+/moduleroot
+    /src
+        /yui-module-name
+            build.json
+            /js
+                module.js
+            /assets
+                yui-module-name-core.css
+                /skins
+                    /sam
+                        yui-module-name-skin.css
+    /build
+```
+
+* The sam skin is the only valid skin at the moment.
+* You may choose to omit the skin.css file.
 
 build.json format
 -----------------
