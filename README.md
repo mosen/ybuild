@@ -148,3 +148,17 @@ Eg. lint options, minify options.
 * `details`
 
 Details which the loader will use to determine the loading order and requirements.
+
+yuibuild vs. yui builder tool
+=============================
+
+Why switch build tools?
+
+* No java dependencies, no ant, no jars.
+* All node.js! several other yui tools already run on node.
+* Just plain faster. Eg:
+
+Building one of my own modules - gallery-datatable-ml
+
++ ant: *3.258s*
++ yuibuild: *0.200s*
