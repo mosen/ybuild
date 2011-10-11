@@ -3,12 +3,25 @@ Summary
 
 yuibuild is a community contributed build system for creating YUI3.x components.
 
-It relies on buildy (http://github.com/mosen/buildy) to do all the work, but builds
-modules specifically to fit the YUI3 Loader.
+It builds javascript and css components to fit the YUI3 Loader,
+which is part of the YUI Framework (http://yuilibrary.com/).
 
-*Documentation under construction*
+*Documentation under heavy construction*
 
-directory structure
+Usage
+-----
+
+`yuibuild gallery-module-name` to build a gallery module *OR*
+`yuibuild *` to build all modules in the current directory.
+
+See `yuibuild -h` for detailed command line options.
+
+Setup
+-----
+
+In order to build your component for yui3, your files should be organised as following:
+
+Directory structure
 -------------------
 
 The directory structure is the same as YUI Builder (https://github.com/yui/builder) with the exception of the
@@ -29,19 +42,18 @@ build.xml and build.properties files. yuibuild uses a *build.json* file instead.
     /build
 ```
 
-* The sam skin is the only valid skin at the moment.
-* You may choose to omit the skin.css file.
+Assets can be omitted if your component won't be skinnable.
 
 build.json format
 -----------------
 
-The build.json file format describes a YUI3.x component in JSON format.
+The build.json file format describes a YUI3.x component in JSON format. It replaces the
+build.xml and build.properties files used with YUI Builder.
 
 _Example_
 
-The following is an example from a gallery module i wrote.
-Note that not all properties are required, notably you can omit skip, tools and details.
-(Though you will probably want to keep the requires and skinnable properties around)
+Almost all of the build.json parts are optional, but you should
+only remove the "skip" and "tools" properties if you don't need them.
 
 ```javascript
 
@@ -82,13 +94,15 @@ Note that not all properties are required, notably you can omit skip, tools and 
 
 ```
 
-build.json reference
---------------------
+build.json properties reference
+-------------------------------
 
 `name`
 
 Name of the YUI module. Will be used in YUI().add() so this is what
 the loader will refer to.
+
+Note that this is the same name you will use inside a YUI().use('modulename'... statement also.
 
 `type`
 
@@ -126,28 +140,3 @@ Eg. lint options, minify options.
 `details`
 
 Details which the loader will use to determine the loading order and requirements.
-
-Use
----
-
-yuibuild can be used in one of two ways, to build a single module, to a local
-directory, or to build a group of modules.
-
-The two use cases will be:
-
-*cwd = module-name*
-
-> yuibuild
-Builds the current module into ./build
-
-OR
-
-*cwd = parent directory*
-
-> yuibuild *
-
-OR
-
-> yuibuild gallery-*
-
-Or some glob, to get matching directories containing build files.
