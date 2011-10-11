@@ -2,8 +2,9 @@ Summary
 -------
 
 yuibuild is a community contributed build system for creating YUI3.x components.
-It relies on https://github.com/mosen/buildy to do the heavy lifting, but defines
-its own file format for specifying how a component should be built.
+
+It relies on buildy (http://github.com/mosen/buildy) to do all the work, but builds
+modules specifically to fit the YUI3 Loader.
 
 *Documentation under construction*
 
