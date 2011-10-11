@@ -1,5 +1,5 @@
 Summary
--------
+=======
 
 yuibuild is a community contributed build system for creating YUI3.x components.
 
@@ -9,7 +9,7 @@ which is part of the YUI Framework (http://yuilibrary.com/).
 *Documentation under heavy construction*
 
 Usage
------
+=====
 
 `yuibuild gallery-module-name` to build a gallery module *OR*
 `yuibuild *` to build all modules in the current directory.
@@ -17,7 +17,7 @@ Usage
 See `yuibuild -h` for detailed command line options.
 
 Setup
------
+=====
 
 In order to build your component for yui3, your files should be organised as following:
 
@@ -97,46 +97,54 @@ only remove the "skip" and "tools" properties if you don't need them.
 build.json properties reference
 -------------------------------
 
-`name`
+* `name`
 
 Name of the YUI module. Will be used in YUI().add() so this is what
 the loader will refer to.
 
 Note that this is the same name you will use inside a YUI().use('modulename'... statement also.
 
-`type`
+
+* `type`
 
 One of "js" or "css". The type of component we are building.
 
-`version`
+
+* `version`
 
 Normally filled with the string "@VERSION@", might be used in building yui itself? *Needs clarification*
 
-`skip`
+
+* `skip`
 
 A list of tasks to skip in the build process.
 
-`sourceDir`
+
+* `sourceDir`
 
 Relative directory to the source files.
 
-`sourceFiles`
+
+* `sourceFiles`
 
 Array of filenames to include when building the module.
 
-`buildDir`
+
+* `buildDir`
 
 Directory where the built files will reside (relative to the module directory).
 
-`assetsDir`
+
+* `assetsDir`
 
 Relative directory to the module assets.
 
-`tools`
+
+* `tools`
 
 Hash containing options passed to specific tasks.
 Eg. lint options, minify options.
 
-`details`
+* `details`
 
 Details which the loader will use to determine the loading order and requirements.
