@@ -89,7 +89,7 @@ if (buildDirs.length === 0) {
 
            path.exists(buildFilePath, function(exists) {
                if (exists) {
-                    var buildComponent = component.factory('json', { buildFile: buildFilePath });
+                    var buildComponent = component.Component(buildFilePath);
                     var builder = new Builder(buildComponent);
                     builder.run();
                } else {
