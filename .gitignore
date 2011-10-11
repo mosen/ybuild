@@ -8,3 +8,5 @@
 /example/component/build/
 /example/build/
 /example/
+npm-debug.log
+yuibuild.iml

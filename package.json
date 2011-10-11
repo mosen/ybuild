@@ -21,10 +21,10 @@
     },
     "repository" : {
         "type" : "git", 
-        "url" : "http://github.com/mosen/yuibuild.git"
+        "url" : "https://github.com/mosen/yuibuild.git"
     }, 
     "dependencies" : {
-        "buildy" : "http://github.com/mosen/buildy/tarball/master"
+        "buildy" : "https://github.com/mosen/buildy/tarball/master"
     },
     "preferGlobal" : true,
     "private" : true
