@@ -9,8 +9,11 @@ var path      = require('path'),
     fs        = require('fs'),
     util      = require('util'),
     events    = require('events'),
-    component = require('../lib/component.js'),
-    Builder   = require('../lib/builder.js').Builder;
+    Queue     = require('buildy/lib/queue').Queue,
+    Buildy    = require('buildy').Buildy,
+    Component = require('../lib/component.js').Component,
+    queues    = require('../lib/queues.js');
+//    Builder   = require('../lib/builder.js').Builder;
 
 var buildFileName = "build.json";
 
@@ -89,9 +92,10 @@ if (buildDirs.length === 0) {
 
            path.exists(buildFilePath, function(exists) {
                if (exists) {
-                    var buildComponent = component.Component(buildFilePath);
-                    var builder = new Builder(buildComponent);
-                    builder.run();
+                    var c = Component(buildFilePath);
+//                    var builder = new Builder(buildComponent);
+//                    builder.run();
+                    build(c);
                } else {
                    console.log('Couldnt find a build file at ' + buildFilePath + ', skipping...');
                }
@@ -100,6 +104,22 @@ if (buildDirs.length === 0) {
     }
 }
 
+function build(component) {
+    var taskQueues = [];
+
+    taskQueues.push(queues._createSourceQueue(component));
+
+    if (component.skinnable) {
+        taskQueues.push(queues._createSkinsQueue(component));
+        taskQueues.push(queues._createAssetsQueue(component));
+    }
+    //taskQueues.push(queues._createDocsQueue(component));
+
+    taskQueues.forEach(function each_queue(moduleQueue) {
+       var worker = new Buildy();
+       moduleQueue.run(worker);
+    }, this);
+}
 
 // Modified from vowsjs
 // 

@@ -41,5 +41,23 @@ module.exports = {
             expected = "./test/fixtures";
 
         assert.equal(sourcedir, expected, 'test sourcedir matches expected sourcedir');
+    },
+
+    'test skin name is included in path to skins directory' : function(beforeExit, assert) {
+        var c = Component('./test/fixtures/build.json'),
+            skins = c.skins;
+
+        assert.equal(skins.core.source, 'test/fixtures/assets/component-core.css', 'test core source css is correct');
+        assert.equal(skins.sam.source, 'test/fixtures/assets/skins/sam/component-skin.css', 'test sam skin css is correct');
+    },
+
+    'test assets build directory matches expected build directory' : function(beforeExit, assert) {
+        var c = Component('./test/fixtures/build.json'),
+            assets = c.assets;
+
+        assert.equal(assets.source, 'test/fixtures/assets');
+        assert.equal(assets.build, 'test/build/assets');
     }
+
+    //'test absence of one skin file does not abort skins queue'
 };
