@@ -17,7 +17,7 @@ var path      = require('path'),
 
 var buildFileName = "build.json";
 
-var header = "yuibuild v0.0.1";
+var header = "yuibuild v0.0.2";
 var usage = [
     "usage: yuibuild [options] <component directory ...>",
     "",
