@@ -162,3 +162,72 @@ Building one of my own modules - gallery-datatable-ml
 
 + ant: *3.258s*
 + yuibuild: *0.200s*
+
+TODO
+====
+
+* Separate logging from every object.
+* Language pack support.
+* YUI Builder Tests target.
+
+```
+"tools" : {
+    "replace" : {
+        "regex" : "yui3loggerregex"
+    },
+    "template" : {
+        "yuivar" : "Y"
+    }
+}
+
+```
+
+Options not yet handled by yuibuild
+-----------------------------------
+
+in yui3
+-------
+
++ srcdir
+different than implied source directory
+
++ component.prependfiles / component.appendfiles
+mostly for license additions?
+
++ component.logger.regex
+set log removal regex per example
+
++ tests.requires / tests.* in async-queue
+tests target in general, builds a test module
+
++ global.build.component or global.* in widget-modality
+top level directories for build/assets
+
++ component.rollup and rollup related functionality.
+check loader still uses rollups?
+
++ yui.core / yui.rls / loader.tnt / loader.yui2
+custom build tasks inside yui seed.
+
++ component._lang in datatype
+
+in yui-gallery
+--------------
+
++ yui.variable
+A in AlloyUI stuff
+
++ component.assets.flatten
+take nested assets and flatten into one target directory
+
++ component.details.auipath and auitype in AlloyUI
+looks like the details are simply amended to YUI().add details line.
+
++ component.assets.base in aui-skin-classic
+alter the base assets directory, normally ./assets
+
++ component.assets.files = images/**/*,css/**/* at aui-skin-classic
+files to match in assets, normally **/*
+
++ component.optionals in gallery-slider-window (optional?)
+can't find documentation with this property.
