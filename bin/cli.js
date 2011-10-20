@@ -95,6 +95,7 @@ if (buildDirs.length === 0) {
                     var c = Component(buildFilePath);
 //                    var builder = new Builder(buildComponent);
 //                    builder.run();
+                    console.log('Starting build for component: ' + c.component);
                     build(c);
                } else {
                    console.log('Couldnt find a build file at ' + buildFilePath + ', skipping...');
