@@ -6,6 +6,8 @@ yuibuild is a community contributed build system for creating YUI3.x components.
 It builds javascript and css components to fit the YUI3 Loader,
 which is part of the YUI Framework (http://yuilibrary.com/).
 
+It depends on mosen/buildy to execute all of the build tasks.
+
 *Documentation under heavy construction*
 
 Usage
@@ -42,7 +44,7 @@ build.xml and build.properties files. yuibuild uses a *build.json* file instead.
     /build
 ```
 
-Assets can be omitted if your component won't be skinnable.
+Assets can be omitted if your component won't be skinnable. (i.e there's no visual aspect of the component).
 
 build.json format
 -----------------
