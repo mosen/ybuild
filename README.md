@@ -1,7 +1,7 @@
 Summary
 =======
 
-yuibuild is a community contributed build system for creating YUI3.x components.
+ybuild is a community contributed build system for creating YUI3.x components.
 
 It builds javascript and css components to fit the YUI3 Loader,
 which is part of the YUI Framework (http://yuilibrary.com/).
@@ -13,10 +13,10 @@ It depends on mosen/buildy to execute all of the build tasks.
 Usage
 =====
 
-`yuibuild gallery-module-name` to build a gallery module *OR*
-`yuibuild *` to build all modules in the current directory.
+`ybuild gallery-module-name` to build a gallery module *OR*
+`ybuild *` to build all modules in the current directory.
 
-See `yuibuild -h` for detailed command line options.
+See `ybuild -h` for detailed command line options.
 
 Setup
 =====
@@ -27,7 +27,7 @@ Directory structure
 -------------------
 
 The directory structure is the same as YUI Builder (https://github.com/yui/builder) with the exception of the
-build.xml and build.properties files. yuibuild uses a *build.json* file instead.
+build.xml and build.properties files. ybuild uses a *build.json* file instead.
 
 ```
 /moduleroot
@@ -151,7 +151,7 @@ Eg. lint options, minify options.
 
 Details which the loader will use to determine the loading order and requirements.
 
-yuibuild vs. yui builder tool
+ybuild vs. yui builder tool
 =============================
 
 Why switch build tools?
@@ -163,7 +163,7 @@ Why switch build tools?
 Building one of my own modules - gallery-datatable-ml
 
 + ant: *3.258s*
-+ yuibuild: *0.200s*
++ ybuild: *0.200s*
 
 TODO
 ====
@@ -184,7 +184,7 @@ TODO
 
 ```
 
-Options not yet handled by yuibuild
+Options not yet handled by ybuild
 -----------------------------------
 
 in yui3
