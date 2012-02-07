@@ -1,8 +1,8 @@
 {
-    "name" : "yuibuild", 
-    "version" : "0.0.2",
-    "description" : "yui3 component builder",
-    "keywords" : ["yui", "build", "buildy"],
+    "name" : "ybuild",
+    "version" : "0.0.3",
+    "description" : "YUI module builder",
+    "keywords" : ["yui", "buildy"],
     "author" : {
         "name" : "Mosen",
         "url" : "https://github.com/mosen"
@@ -13,7 +13,7 @@
         "templates" 
     ], 
     "main" : "./lib/builder.js",
-    "bin": { "yuibuild": "./bin/cli.js" },
+    "bin": { "ybuild": "./bin/cli.js", "builder2ybuild": "./bin/builder2ybuild.js" },
     "directories" : {
         "lib" : "./lib",
         "bin" : "./bin",
@@ -21,10 +21,10 @@
     },
     "repository" : {
         "type" : "git", 
-        "url" : "https://github.com/mosen/yuibuild.git"
+        "url" : "https://github.com/mosen/ybuild.git"
     }, 
     "dependencies" : {
-        "buildy" : "https://github.com/mosen/buildy/tarball/master"
+        "nopt" : "*"
     },
     "preferGlobal" : true,
     "private" : true

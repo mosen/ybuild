@@ -212,6 +212,7 @@ check loader still uses rollups?
 custom build tasks inside yui seed.
 
 + component._lang in datatype
+used to populate each datatype module with a list of languages.
 
 in yui-gallery
 --------------
