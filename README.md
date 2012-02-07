@@ -104,40 +104,40 @@ The following is an example where most of the possible options are set...
 build.json properties reference
 -------------------------------
 
-*   ### name__ ### *required*
+*   __name__ *required*
     Name of the YUI module. Will be used in YUI().add() so this is what
     the loader will refer to when you include the name in YUI().use('name').
 
-*   `type` (required)
+*   __type__ *required*
     One of "js" or "css". The type of component we are building.
     "css" implies that "sourceFiles" will only contain stylesheets.
     You should also set "sourceDir" to "css".
 
-*   `version`
+*   __version__
     Normally filled with the string "@VERSION@", might be used in building yui itself? *Needs clarification*
 
-*   `skip`
+*   __skip__
     Array of tasks to skip, identified by their name in buildy.
 
-*   `sourceDir`
+*   __sourceDir__
     Relative directory to the source files. If omitted, defaults to a subdirectory
     named after the "type" option.
 
-*   `sourceFiles`
+*   __sourceFiles__
     Array of filenames to include when building the module (with extensions).
 
-*   `buildDir`
+*   __buildDir__
     Directory where the built files will reside (relative to the module directory).
     In a YUI build tree structure this will be "../../build/yui-module-name"
 
-*   `assetsDir`
+*   __assetsDir__
     Relative directory to the module assets.
 
-*   `tasks`
+*   __tasks__
     Hash containing options passed to specific tasks.
     Eg. lint options, minify options.
 
-*   `details`
+*   __details__
     Details which the loader will use to determine the loading order and requirements.
 
 ybuild vs. yui builder tool
