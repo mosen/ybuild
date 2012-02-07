@@ -79,7 +79,9 @@ The following is an example where most of the possible options are set...
             "template_option" : "template_value"
         }
     },
-    "details" : { // Loader.addModule()
+    "details" : {
+        // These options are all copied from the current Loader's addModule() implementation.
+        // Some may not be yet supported by ybuild.
         "requires"   : ["base"],
         "optional"   : [],
         "supersedes" : [],
@@ -104,41 +106,63 @@ The following is an example where most of the possible options are set...
 build.json properties reference
 -------------------------------
 
-*   __name__ *required*
+*  __name__ 
+   
+    *required* 
+
     Name of the YUI module. Will be used in YUI().add() so this is what
     the loader will refer to when you include the name in YUI().use('name').
 
-*   __type__ *required*
-    One of "js" or "css". The type of component we are building.
-    "css" implies that "sourceFiles" will only contain stylesheets.
-    You should also set "sourceDir" to "css".
+*   __type__ 
+    
+    *required*
+
+    One of `js` or `css`. The type of component we are building.
+    `css` implies that `sourceFiles` will only contain stylesheets.
+    You should also set `sourceDir` to `css`.
 
 *   __version__
-    Normally filled with the string "@VERSION@", might be used in building yui itself? *Needs clarification*
+
+    default : `@VERSION@`
+    
+    Normally filled with the string `@VERSION@`, might be used in building yui itself? *Needs clarification*
 
 *   __skip__
+
     Array of tasks to skip, identified by their name in buildy.
 
 *   __sourceDir__
+
     Relative directory to the source files. If omitted, defaults to a subdirectory
-    named after the "type" option.
+    named after the `type` option.
 
 *   __sourceFiles__
+
+    *required*
+    
     Array of filenames to include when building the module (with extensions).
 
 *   __buildDir__
+
+    default : `../../build/modulename` 
+    
     Directory where the built files will reside (relative to the module directory).
-    In a YUI build tree structure this will be "../../build/yui-module-name"
 
 *   __assetsDir__
+
+    default : `./assets`
+
     Relative directory to the module assets.
 
 *   __tasks__
+
     Hash containing options passed to specific tasks.
     Eg. lint options, minify options.
 
 *   __details__
+
     Details which the loader will use to determine the loading order and requirements.
+    See the example for possible options, also see yui3 loader docs (specifically addModule()).
 
 ybuild vs. yui builder tool
 =============================
