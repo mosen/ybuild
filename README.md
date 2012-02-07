@@ -27,7 +27,7 @@ Directory structure
 -------------------
 
 The directory structure is the same as YUI Builder (https://github.com/yui/builder) with the exception of the
-build.xml and build.properties files. ybuild uses a *build.json* file instead.
+build.xml and build.properties files. ybuild uses a *build.json* file instead to describe all the same parameters.
 
 ```
 /moduleroot
@@ -44,7 +44,7 @@ build.xml and build.properties files. ybuild uses a *build.json* file instead.
     /build
 ```
 
-Assets can be omitted if your component won't be skinnable. (i.e there's no visual aspect of the component).
+Assets can be omitted if your component won't be skinnable. (i.e there's no stylesheets OR images).
 
 build.json format
 -----------------
@@ -54,43 +54,48 @@ build.xml and build.properties files used with YUI Builder.
 
 _Example_
 
-Almost all of the build.json parts are optional, but you should
-only remove the "skip" and "tools" properties if you don't need them.
+All parts of the json spec are optional except where noted as required.
+The following is an example where most of the possible options are set...
 
 ```javascript
 
 {
     "name"    : "yui-module-name",
+    "description" : "An example module",
     "type"    : "js",
     "version" : "1.0.0",
-    "skip"    : {
-        "clean"    : false,
-        "register" : false,
-        "lint"     : false,
-        "logger"   : false
-    },
+    "skip"    : ["template", "jslint"],
     "sourceDir"   : "js",
     "sourceFiles" : [
         "module.js"
     ],
     "buildDir"  : "../../build/yui-module-name",
     "assetsDir" : "assets",
-    "tools"     : {
-        "jslint"  : {
-            "jslint option" : null
+    "tasks" : {
+        "jslint" : {
+            "jslint_option" : "jslint_value"
         },
-        "csslint" : {
-            "csslint option" : null
+        "template" : {
+            "template_option" : "template_value"
         }
     },
-    "details" : {
-        "use"        : null,
-        "supersedes" : null,
+    "details" : { // Loader.addModule()
         "requires"   : ["base"],
-        "optional"   : null,
-        "after"      : null,
+        "optional"   : [],
+        "supersedes" : [],
+        "after"      : [],
         "after_map"  : {},
-        "skinnable"  : true
+        "rollup"     : undefined,
+        "skinnable"  : true,
+        "submodules" : {},
+        "group"      : "",
+        "lang"       : ["en-US"],
+        "condition"  : {
+            "trigger" : "testmodule",
+            "test" : function(),
+            "when" : "before|after|instead"
+        },
+        "use"        : null // Not documented, gets munged into supersedes anyway.
     }
 }
 
@@ -99,57 +104,41 @@ only remove the "skip" and "tools" properties if you don't need them.
 build.json properties reference
 -------------------------------
 
-* `name`
+*   ### name__ ### *required*
+    Name of the YUI module. Will be used in YUI().add() so this is what
+    the loader will refer to when you include the name in YUI().use('name').
 
-Name of the YUI module. Will be used in YUI().add() so this is what
-the loader will refer to.
+*   `type` (required)
+    One of "js" or "css". The type of component we are building.
+    "css" implies that "sourceFiles" will only contain stylesheets.
+    You should also set "sourceDir" to "css".
 
-Note that this is the same name you will use inside a YUI().use('modulename'... statement also.
+*   `version`
+    Normally filled with the string "@VERSION@", might be used in building yui itself? *Needs clarification*
 
+*   `skip`
+    Array of tasks to skip, identified by their name in buildy.
 
-* `type`
+*   `sourceDir`
+    Relative directory to the source files. If omitted, defaults to a subdirectory
+    named after the "type" option.
 
-One of "js" or "css". The type of component we are building.
+*   `sourceFiles`
+    Array of filenames to include when building the module (with extensions).
 
+*   `buildDir`
+    Directory where the built files will reside (relative to the module directory).
+    In a YUI build tree structure this will be "../../build/yui-module-name"
 
-* `version`
+*   `assetsDir`
+    Relative directory to the module assets.
 
-Normally filled with the string "@VERSION@", might be used in building yui itself? *Needs clarification*
+*   `tasks`
+    Hash containing options passed to specific tasks.
+    Eg. lint options, minify options.
 
-
-* `skip`
-
-A list of tasks to skip in the build process.
-
-
-* `sourceDir`
-
-Relative directory to the source files.
-
-
-* `sourceFiles`
-
-Array of filenames to include when building the module.
-
-
-* `buildDir`
-
-Directory where the built files will reside (relative to the module directory).
-
-
-* `assetsDir`
-
-Relative directory to the module assets.
-
-
-* `tools`
-
-Hash containing options passed to specific tasks.
-Eg. lint options, minify options.
-
-* `details`
-
-Details which the loader will use to determine the loading order and requirements.
+*   `details`
+    Details which the loader will use to determine the loading order and requirements.
 
 ybuild vs. yui builder tool
 =============================
@@ -171,18 +160,7 @@ TODO
 * Separate logging from every object.
 * Language pack support.
 * YUI Builder Tests target.
-
-```
-"tools" : {
-    "replace" : {
-        "regex" : "yui3loggerregex"
-    },
-    "template" : {
-        "yuivar" : "Y"
-    }
-}
-
-```
+* Handle error where one part of the skin exists, and the other doesn't (core without skin etc).
 
 Options not yet handled by ybuild
 -----------------------------------
