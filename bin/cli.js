@@ -36,7 +36,7 @@ var path        = require('path')
         "",
         "options:",
         "  -h, --help            Display this help message",
-        "  -r, --recursive       Search recursively for components to build",
+//        "  -r, --recursive       Search recursively for components to build",
         "  -v, -vv, -vvv         Verbosity level (Warnings, Info, Verbose) (default Info)",
         "  -f, --buildfile       Use this filename to read build options (default \"build.json\")",
         "  -c, --color           Colorize the console output",
