@@ -6,25 +6,22 @@
     "author" : {
         "name" : "Mosen",
         "url" : "https://github.com/mosen"
-    }, 
-    "files" : [ 
-        "builder.js",
-        "component.js",
-        "templates" 
-    ], 
-    "main" : "./lib/builder.js",
+    },
+    "main" : "./lib/queues.js",
     "bin": { "ybuild": "./bin/cli.js", "builder2ybuild": "./bin/builder2ybuild.js" },
     "directories" : {
-        "lib" : "./lib",
-        "bin" : "./bin",
-        "example" : "./example"
+        "lib" : "lib",
+        "bin" : "bin",
+        "example" : "examples"
     },
     "repository" : {
         "type" : "git", 
         "url" : "https://github.com/mosen/ybuild.git"
     }, 
     "dependencies" : {
-        "nopt" : "*"
+        "nopt" : "1.0.x",
+	    "winston" : "0.5.x",
+        "pkginfo" : "0.2.x"
     },
     "preferGlobal" : true,
     "private" : true

@@ -1,0 +1,22 @@
+{
+    "name"    : "module",
+    "description " : "example yui module",
+    "type"    : "js",
+    "version" : "1.0.0",
+    "sourceDir"   : "js",
+    "sourceFiles" : [
+        "component.js"
+    ],
+    "buildDir"  : "../build",
+    "assetsDir" : "assets",
+    "details" : {
+        "use"        : null,      
+        "supersedes" : null,
+        "requires"   : ["base"],
+        "optional"   : null,
+        "after"      : null,
+        "after_map"  : {},
+        "lang"       : ["en-US"],
+        "skinnable"  : true
+    }
+}

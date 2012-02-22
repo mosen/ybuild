@@ -1,0 +1,4 @@
+{
+    HELLO: "Hallo!",
+    GOODBYE: "Tschüß!"
+}

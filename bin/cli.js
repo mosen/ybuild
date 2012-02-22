@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 
 /*
- * ybuild, a yui builder tool
+ * ybuild, a tool for building YUI components.
  * https://github.com/mosen/ybuild
+ *
+ * See http://yuilibrary.com for more information about the YUI framework.
  */
 
 var path        = require('path')
     , nopt      = require('nopt')
-    , winston   = require('winston')
+    , pkginfo   = require('pkginfo')(module)
+    , winston   = require('winston') // Required because we are superseding buildy's logging behaviour.
     , Component = require('../lib/component.js').Component
     , queues    = require('../lib/queues.js')
     , knownOpts = { "help" : Boolean
@@ -27,7 +30,7 @@ var path        = require('path')
     , parsed = nopt(knownOpts, shortHands, process.argv, 2)
     , buildDirs = parsed.argv.remain
     , logger = new (winston.Logger)()
-    , header = "ybuild v0.0.2"
+    , header = "ybuild " + module.exports.version
     , usage = [
         "usage: ybuild [options] <dirname ...>",
         "",
@@ -86,7 +89,6 @@ function build(component) {
         taskQueues.push(queues._createSkinsQueue(component, queueOpts));
         taskQueues.push(queues._createAssetsQueue(component, queueOpts));
     }
-    //taskQueues.push(queues._createDocsQueue(component));
 
     taskQueues.forEach(function each_queue(moduleQueue) {
        moduleQueue.run();
