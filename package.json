@@ -8,7 +8,7 @@
         "url" : "https://github.com/mosen"
     },
     "main" : "./lib/queues.js",
-    "bin": { "ybuild": "./bin/cli.js", "builder2ybuild": "./bin/builder2ybuild.js" },
+    "bin": { "ybuild": "./bin/cli.js" },
     "directories" : {
         "lib" : "lib",
         "bin" : "bin",
@@ -19,10 +19,14 @@
         "url" : "https://github.com/mosen/ybuild.git"
     }, 
     "dependencies" : {
+        "buildy" : "0.0.5",
         "nopt" : "1.0.x",
 	    "winston" : "0.5.x",
         "pkginfo" : "0.2.x"
     },
-    "preferGlobal" : true,
-    "private" : true
+    "devDependencies" : {
+        "expresso" : "0.9.x",
+        "temp" : "0.4.x"
+    },
+    "preferGlobal" : true
 }
