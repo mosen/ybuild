@@ -7,7 +7,7 @@
     "sourceFiles" : [
         "component.js"
     ],
-    "buildDir"  : "../build",
+    "buildDir"  : "../build/module",
     "assetsDir" : "assets",
     "details" : {
         "use"        : null,      

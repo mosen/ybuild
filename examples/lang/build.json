@@ -3,5 +3,5 @@
     "description " : "language resource example",
     "type"    : "js",
     "version" : "1.0.0",
-    "lang"    : ['de', 'en-US']
+    "lang"    : ["de", "en-US"]
 }
