@@ -83,6 +83,14 @@ function build(component) {
             logger: logger
         };
 
+    if (component.skip.length > 0) {
+        queueOpts.skip = component.skip;
+    }
+
+    if (Object.keys(component.tasks).length > 0) {
+        queueOpts.defaults = component.tasks;
+    }
+
     taskQueues.push(queues._createSourceQueue(component, queueOpts));
 
     if (component.skinnable) {

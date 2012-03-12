@@ -3,19 +3,18 @@
     "type"    : "js",
     "version" : "@VERSION@",
     "skip"    : [
-        "files"
     ],
     "sourceDir"   : "js",
     "sourceFiles" : [
-        "./component.js"
+        "../component.js"
     ],
-    "buildDir"  : "./build",
-    "assetsDir" : "./assets",
+    "buildDir"  : "../build",
+    "assetsDir" : "../assets",
     "tasks"     : {
 
     },
     "details" : {
-        "use"        : null,
+        "use"        : null,      
         "supersedes" : null,
         "requires"   : ["base"],
         "optional"   : null,
