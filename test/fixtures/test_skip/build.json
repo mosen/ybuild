@@ -3,10 +3,11 @@
     "type"    : "js",
     "version" : "@VERSION@",
     "skip"    : [
+        "write"
     ],
-    "sourceDir"   : "js",
+    "sourceDir"   : "../js",
     "sourceFiles" : [
-        "../component.js"
+        "component.js"
     ],
     "buildDir"  : "../build",
     "assetsDir" : "../assets",
