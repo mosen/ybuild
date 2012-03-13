@@ -1,5 +1,6 @@
 var child_process = require('child_process'),
     path = require('path'),
+    fs = require('fs'),
     cli_path = path.resolve(path.join(__dirname, '../bin/cli.js'));
 
 function attachConsole(child) {
@@ -14,16 +15,20 @@ function attachConsole(child) {
 
 
 module.exports = {
-    'test skip' : function(beforeExit, assert) {
-        var test_dir = path.resolve(path.join(__dirname, './fixtures/skip'));
+    'test write task is skipped by skip feature' : function(beforeExit, assert) {
+        var test_dir = path.resolve(path.join(__dirname, './fixtures/test_skip')),
+            build_dir = path.resolve(path.join(__dirname, './fixtures/build'));
 
         var ybuild = child_process.spawn('node', [cli_path, '.'], { cwd: test_dir, env: process.env });
         attachConsole(ybuild);
 
         ybuild.on('exit', function (code) {
             beforeExit(function() {
-                assert.equal(1, code, 'exit status was ok (' + code + ')');
-            })
+                assert.equal(0, code, 'exit status was ok (' + code + ')');
+                assert.ok(!path.existsSync(path.join(build_dir, '/component.js')), build_dir + '/component.js should not exist');
+                assert.ok(!path.existsSync(path.join(build_dir, '/component-min.js')), build_dir + '/component-min.js should not exist');
+                assert.ok(!path.existsSync(path.join(build_dir, '/component-debug.js')), build_dir + '/component-debug.js should not exist');
+            });
         });
     }
 }
