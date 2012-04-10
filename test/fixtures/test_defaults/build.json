@@ -1,0 +1,27 @@
+{
+    "name"    : "component",
+    "type"    : "js",
+    "version" : "@VERSION@",
+    "skip"    : [],
+    "sourceDir"   : "../js",
+    "sourceFiles" : [
+        "component.js"
+    ],
+    "buildDir"  : "../build",
+    "assetsDir" : "../assets",
+    "tasks"     : {
+        "jslint" : {
+            "bitwise" : false
+        }
+    },
+    "details" : {
+        "use"        : null,      
+        "supersedes" : null,
+        "requires"   : ["base"],
+        "optional"   : null,
+        "after"      : null,
+        "after_map"  : {},
+        "lang"       : ["en-US"],
+        "skinnable"  : false
+    }
+}
