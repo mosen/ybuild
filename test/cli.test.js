@@ -19,6 +19,9 @@ module.exports = {
         var test_dir = path.resolve(path.join(__dirname, './fixtures/test_skip')),
             build_dir = path.resolve(path.join(__dirname, './fixtures/build'));
 
+        console.log("Spawning ybuild as a child process");
+        console.log("node " + cli_path);
+        console.log("CWD: " + test_dir);
         var ybuild = child_process.spawn('node', [cli_path, '.'], { cwd: test_dir, env: process.env });
         attachConsole(ybuild);
 
