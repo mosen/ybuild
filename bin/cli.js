@@ -64,7 +64,7 @@ if (parsed.recursive) {
     buildDirs.forEach(function(dir) {
        var buildFilePath = path.join(dir, parsed.buildfile);
 
-       path.exists(buildFilePath, function(exists) {
+       fs.exists(buildFilePath, function(exists) {
            if (exists) {
                 var c = Component(buildFilePath);
 
