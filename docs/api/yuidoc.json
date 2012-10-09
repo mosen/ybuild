@@ -1,0 +1,14 @@
+{
+    "name" : "ybuild",
+    "description" : "A build tool for YUI modules",
+    "version" : "0.0.8",
+    "url" : "https://github.com/mosen/ybuild",
+    "options" : {
+        "outdir" : "./html",
+        "attributesEmit" : "false",
+        "paths" : [
+            "../../lib",
+            "../../bin"
+        ]
+    }
+}

@@ -19,9 +19,7 @@
         "url" : "https://github.com/mosen/ybuild.git"
     }, 
     "dependencies" : {
-        "buildy" : "0.0.7",
-        "nopt" : "1.0.x",
-	    "winston" : "0.5.x",
+        "nopt" : "2.0.x",
         "pkginfo" : "0.2.x"
     },
     "devDependencies" : {
