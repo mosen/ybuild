@@ -3,12 +3,12 @@
     "type"    : "js",
     "version" : "@VERSION@",
     "skip"    : [],
-    "sourceDir"   : "../js",
+    "source_directory"   : "../js",
     "sourceFiles" : [
         "component.js"
     ],
-    "buildDir"  : "../build",
-    "assetsDir" : "../assets",
+    "build_directory"  : "../build",
+    "assets_directory" : "assets",
     "tasks"     : {
         "jslint" : {
             "bitwise" : false

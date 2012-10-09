@@ -1,30 +1,33 @@
 {
-    "name" : "ybuild",
-    "version" : "0.0.5",
-    "description" : "YUI module builder",
-    "keywords" : ["yui", "yuibuild"],
-    "author" : {
-        "name" : "Mosen",
-        "url" : "https://github.com/mosen"
+    "name": "ybuild",
+    "version": "0.0.5",
+    "description": "YUI module builder",
+    "keywords": ["yui", "yuibuild"],
+    "author": {
+        "name": "Mosen",
+        "url": "https://github.com/mosen"
     },
-    "main" : "./lib/queues.js",
-    "bin": { "ybuild": "./bin/cli.js" },
-    "directories" : {
-        "lib" : "lib",
-        "bin" : "bin",
-        "example" : "examples"
+    "main": "./lib/queues.js",
+    "bin": {
+        "ybuild": "./bin/cli.js"
     },
-    "repository" : {
-        "type" : "git", 
-        "url" : "https://github.com/mosen/ybuild.git"
-    }, 
-    "dependencies" : {
-        "nopt" : "2.0.x",
-        "pkginfo" : "0.2.x"
+    "directories": {
+        "lib": "lib",
+        "bin": "bin",
+        "example": "examples"
     },
-    "devDependencies" : {
-        "expresso" : "0.9.x",
-        "temp" : "0.4.x"
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mosen/ybuild.git"
     },
-    "preferGlobal" : true
+    "dependencies": {
+        "nopt": "2.0.x",
+        "pkginfo": "0.2.x"
+    },
+    "devDependencies": {
+        "mocha": "1.6.x",
+        "should": "1.2.x",
+        "temp": "0.4.x"
+    },
+    "preferGlobal": true
 }
