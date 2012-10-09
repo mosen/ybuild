@@ -64,13 +64,13 @@ function build(component) {
             logger: console
         };
 
-    if (component.skip.length > 0) {
-        queueOpts.skip = component.skip;
-    }
+//    if (component.skip.length > 0) {
+//        queueOpts.skip = component.skip;
+//    }
 
-    if (Object.keys(component.tasks).length > 0) {
-        queueOpts.defaults = component.tasks;
-    }
+//    if (Object.keys(component.tasks).length > 0) {
+//        queueOpts.defaults = component.tasks;
+//    }
 
     taskQueues.push(queues._createSourceQueue(component, queueOpts));
 

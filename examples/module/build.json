@@ -3,12 +3,12 @@
     "description " : "example yui module",
     "type"    : "js",
     "version" : "1.0.0",
-    "sourceDir"   : "js",
+    "source_directory"   : "js",
     "sourceFiles" : [
         "component.js"
     ],
-    "buildDir"  : "../build/module",
-    "assetsDir" : "assets",
+    "build_directory"  : "../build/module",
+    "assets_directory" : "assets",
     "details" : {
         "use"        : null,      
         "supersedes" : null,

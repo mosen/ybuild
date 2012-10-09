@@ -1,6 +1,6 @@
 {
     "name": "ybuild",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "description": "YUI module builder",
     "keywords": ["yui", "yuibuild"],
     "author": {
@@ -21,6 +21,7 @@
         "url": "https://github.com/mosen/ybuild.git"
     },
     "dependencies": {
+        "buildy": "0.0.8",
         "nopt": "2.0.x",
         "pkginfo": "0.2.x"
     },
